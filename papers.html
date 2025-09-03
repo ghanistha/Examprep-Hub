@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previous Year Papers - ExamPrep Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">ExamPrep Hub</a>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="exams.html" class="nav-link">Exams</a></li>
+                <li class="nav-item"><a href="schedule.html" class="nav-link">Schedule</a></li>
+                <li class="nav-item"><a href="calendar.html" class="nav-link">Exam Calendar</a></li>
+                <li class="nav-item"><a href="videos.html" class="nav-link">Videos</a></li>
+                <li class="nav-item"><a href="papers.html" class="nav-link active">Previous Papers</a></li>
+                <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="papers-main">
+        <div class="container">
+            <h1>Previous Year Papers</h1>
+            
+            <div class="papers-filter">
+                <select id="paperFilter">
+                    <option value="all">All Exams</option>
+                    <option value="upsc">UPSC</option>
+                    <option value="mpsc">MPSC</option>
+                    <option value="ssc">SSC</option>
+                </select>
+            </div>
+
+            <div class="papers-grid">
+                <div class="paper-card upsc">
+                    <h3>UPSC Prelims 2023</h3>
+                    <p>General Studies Paper I & II</p>
+                    <div>
+                        <span class="video-category">UPSC</span>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                </div>
+
+                <div class="paper-card ssc">
+                    <h3>SSC CGL 2023</h3>
+                    <p>Tier 1 All Shifts</p>
+                    <div>
+                        <span class="video-category">SSC</span>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                </div>
+
+                <div class="paper-card mpsc">
+                    <h3>MPSC State Service 2023</h3>
+                    <p>Preliminary Examination</p>
+                    <div>
+                        <span class="video-category">MPSC</span>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 ExamPrep Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

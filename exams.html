@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exams - ExamPrep Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+            color: #666;
+        }
+      .exams-main { margin-top: 90px; padding: 2rem 0 3rem; }
+      .exams-header { text-align: center; margin-bottom: 2rem; }
+      .exams-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+      .exam-card-lg { background: #fff; border-radius: 12px; box-shadow: var(--shadow); padding: 1.5rem; display: flex; gap: 1rem; align-items: flex-start; }
+      .exam-card-lg i { font-size: 2rem; color: var(--primary); }
+      .exam-card-lg h3 { margin-bottom: 0.4rem; color: var(--bg-dark); }
+      .exam-card-lg p { color: #666; margin-bottom: 0.8rem; }
+      .exam-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+      .btn-outline { border: 2px solid var(--primary); color: var(--primary); background: transparent; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+      .btn-outline:hover { background: var(--primary); color: #fff; }
+    </style>
+
+  </head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">ExamPrep Hub</a>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="exams.html" class="nav-link active">Exams</a></li>
+                <li class="nav-item"><a href="schedule.html" class="nav-link">Schedule</a></li>
+                <li class="nav-item"><a href="calendar.html" class="nav-link">Exam Calendar</a></li>
+                <li class="nav-item"><a href="videos.html" class="nav-link">Videos</a></li>
+                <li class="nav-item"><a href="papers.html" class="nav-link">Previous Papers</a></li>
+                <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="exams-main">
+        <div class="container">
+            <div class="exams-header">
+                <h1>Explore Competitive Exams</h1>
+                <p>Choose an exam to view syllabus, pattern, strategy, and resources</p>
+            </div>
+            <div class="exams-grid">
+                <div class="exam-card-lg">
+                    <i class="fas fa-university"></i>
+                    <div>
+                        <h3>UPSC Civil Services</h3>
+                        <p>All-India Civil Services Examination conducted by UPSC</p>
+                        <div class="exam-actions">
+                            <a href="upsc.html" class="btn-outline">View Details</a>
+                            <a href="videos.html" class="btn-outline">Watch Videos</a>
+                            <a href="papers.html" class="btn-outline">Previous Papers</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="exam-card-lg">
+                    <i class="fas fa-building"></i>
+                    <div>
+                        <h3>MPSC State Service</h3>
+                        <p>State services examination conducted by Maharashtra PSC</p>
+                        <div class="exam-actions">
+                            <a href="mpsc.html" class="btn-outline">View Details</a>
+                            <a href="videos.html" class="btn-outline">Watch Videos</a>
+                            <a href="papers.html" class="btn-outline">Previous Papers</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="exam-card-lg">
+                    <i class="fas fa-clipboard-list"></i>
+                    <div>
+                        <h3>SSC Examinations</h3>
+                        <p>Various combined examinations conducted by SSC</p>
+                        <div class="exam-actions">
+                            <a href="ssc.html" class="btn-outline">View Details</a>
+                            <a href="videos.html" class="btn-outline">Watch Videos</a>
+                            <a href="papers.html" class="btn-outline">Previous Papers</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© Error404. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

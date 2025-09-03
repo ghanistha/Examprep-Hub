@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam Calendar - ExamPrep Hub</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <meta name="description" content="Stay updated with the latest UPSC, MPSC, SSC exam dates and deadlines. ExamPrep Hub Exam Calendar keeps you on track for your government exam preparation.">
+  
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .footer {
+      background-color: #f1f1f1;
+      text-align: center;
+      padding: 15px 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* Calendar Section */
+    .calendar-main {
+      margin-top: 90px;
+      padding: 2rem 0 3rem;
+    }
+
+    .calendar-main h1 {
+      text-align: center;
+      color: var(--bg-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .calendar-intro {
+      text-align: center;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .calendar-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .calendar-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .calendar-card h3 {
+      margin-bottom: 1rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .calendar-event {
+      color: #444;
+      margin: 0.6rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 15px;
+      padding: 8px 10px;
+      border-left: 3px solid var(--primary);
+      background: #f9f9f9;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .calendar-event:hover {
+      background: #f1f1f1;
+    }
+
+    .calendar-event i {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <a href="index.html">ExamPrep Hub</a>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="exams.html" class="nav-link">Exams</a></li>
+        <li class="nav-item"><a href="schedule.html" class="nav-link">Schedule</a></li>
+        <li class="nav-item"><a href="calendar.html" class="nav-link active">Exam Calendar</a></li>
+        <li class="nav-item"><a href="videos.html" class="nav-link">Videos</a></li>
+        <li class="nav-item"><a href="papers.html" class="nav-link">Previous Papers</a></li>
+        <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+      </ul>
+      <div class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="calendar-main">
+    <div class="container">
+      <h1>📅 Exam Calendar</h1>
+      <p class="calendar-intro">Track upcoming exams, deadlines, and important dates to stay ahead in your preparation.</p>
+      
+      <div class="calendar-grid">
+        <!-- June -->
+        <div class="calendar-card">
+          <h3><i class="fas fa-calendar-check"></i> June 2024</h3>
+          <div class="calendar-event"><i class="fas fa-dot-circle"></i> UPSC Prelims – <strong>16 Jun</strong></div>
+          <div class="calendar-event"><i class="fas fa-dot-circle"></i> SSC CGL Application Deadline – <strong>10 Jun</strong></div>
+        </div>
+
+        <!-- July -->
+        <div class="calendar-card">
+          <h3><i class="fas fa-calendar-check"></i> July 2024</h3>
+          <div class="calendar-event"><i class="fas fa-dot-circle"></i> SSC CGL Tier 1 – <strong>14–25 Jul</strong></div>
+          <div class="calendar-event"><i class="fas fa-dot-circle"></i> MPSC Application Deadline – <strong>20 Jul</strong></div>
+        </div>
+
+        <!-- August -->
+        <div class="calendar-card">
+          <h3><i class="fas fa-calendar-check"></i> August 2024</h3>
+          <div class="calendar-event"><i class="fas fa-dot-circle"></i> MPSC Prelims – <strong>18 Aug</strong></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 ExamPrep Hub. Developed by Error404.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
