@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: examprep-hub
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_TYPE
+        value: postgresql
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://examprep-hub.onrender.com
+
+  - type: pserv
+    name: examprep-hub-db
+    env: postgresql
+    plan: free
+    ipAllowList: []

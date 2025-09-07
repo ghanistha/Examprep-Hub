@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Previous Year Papers - ExamPrep Hub</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <a href="index.html">ExamPrep Hub</a>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="exams.html" class="nav-link">Exams</a></li>
+        <li class="nav-item"><a href="schedule.html" class="nav-link">Schedule</a></li>
+        <li class="nav-item"><a href="calendar.html" class="nav-link">Exam Calendar</a></li>
+        <li class="nav-item"><a href="videos.html" class="nav-link">Videos</a></li>
+        <li class="nav-item"><a href="papers.html" class="nav-link active">Previous Papers</a></li>
+        <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+      </ul>
+      <div class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="papers-main">
+    <div class="container">
+      <h1>Previous Year Papers</h1>
+      
+      <!-- Filters -->
+      <div id="filters" class="filter-section">
+        <div class="filter-group">
+          <label for="examFilter">Filter by Exam:</label>
+          <select id="examFilter" onchange="applyFilters()">
+            <option value="">All Exams</option>
+            <option value="UPSC_CSE">UPSC</option>
+            <option value="MPSC_SS">MPSC</option>
+            <option value="SSC_CGL">SSC</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="yearFilter">Filter by Year:</label>
+          <select id="yearFilter" onchange="applyFilters()">
+            <option value="">All Years</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="typeFilter">Filter by Type:</label>
+          <select id="typeFilter" onchange="applyFilters()">
+            <option value="">All Types</option>
+            <option value="prelims">Prelims</option>
+            <option value="mains">Mains</option>
+            <option value="interview">Interview</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="searchBox">Search:</label>
+          <input type="text" id="searchBox" placeholder="Search papers..." oninput="applyFilters()">
+        </div>
+      </div>
+
+      <!-- Papers container -->
+      <div id="papersContainer" class="papers-grid">
+        <div class="loading">
+          <i class="fas fa-spinner fa-spin"></i> Loading papers...
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- PDF Viewer Modal -->
+  <div id="pdfViewer" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="pdfTitle"></h3>
+        <span class="close" onclick="closePdfViewer()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="pdfLoading" class="pdf-loading">
+          <i class="fas fa-spinner fa-spin"></i> Loading PDF...
+        </div>
+        <iframe id="pdfFrame" width="100%" height="500px" style="display: none;" onload="hidePdfLoading()"></iframe>
+        <div id="pdfError" class="pdf-error" style="display: none;">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p>Unable to load PDF. Please try downloading the file instead.</p>
+          <button class="btn btn-download" onclick="downloadCurrentPdf()">
+            <i class="fas fa-download"></i> Download PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© Error404. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    let papers = [];
+    let filteredPapers = [];
+
+    // Load papers from API
+    async function loadPapers() {
+      try {
+        console.log('Loading papers from API...');
+        const response = await fetch('/api/papers');
+        const data = await response.json();
+        
+        papers = data.papers;
+        filteredPapers = [...papers];
+        
+        console.log('Papers loaded:', papers.length);
+        renderPapers();
+        updateFilters();
+      } catch (error) {
+        console.error('Error loading papers:', error);
+        document.getElementById('papersContainer').innerHTML = 
+          '<div class="error">Error loading papers. Please try again.</div>';
+      }
+    }
+
+    // Render papers
+    function renderPapers() {
+      const container = document.getElementById('papersContainer');
+      container.innerHTML = '';
+
+      if (filteredPapers.length === 0) {
+        container.innerHTML = '<div class="no-papers">No papers found matching your criteria.</div>';
+        return;
+      }
+
+      filteredPapers.forEach(paper => {
+        const div = document.createElement('div');
+        div.className = 'paper-card';
+        div.innerHTML = `
+          <h3>${paper.title}</h3>
+          <p class="paper-description">${paper.description || 'No description available'}</p>
+          <div class="paper-meta">
+            <span class="paper-year">${paper.year}</span>
+            <span class="paper-type">${paper.paper_type}</span>
+          </div>
+          <div class="paper-info">
+            <small><strong>Exam:</strong> ${paper.exam_name}</small>
+            <small><i class="fas fa-download"></i> ${paper.download_count || 0} downloads</small>
+          </div>
+          <div class="paper-actions">
+            <button class="btn btn-view" onclick="viewPdf('${paper.file_path}')">
+              <i class="fas fa-eye"></i> View
+            </button>
+            <button class="btn btn-download" onclick="downloadPaper(${paper.id})">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Update filter options
+    function updateFilters() {
+      // Update year filter
+      const years = [...new Set(papers.map(p => p.year))].sort((a, b) => b - a);
+      const yearSelect = document.getElementById('yearFilter');
+      yearSelect.innerHTML = '<option value="">All Years</option>';
+      years.forEach(year => {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelect.appendChild(option);
+      });
+    }
+
+    // Apply filters
+    function applyFilters() {
+      const examFilter = document.getElementById('examFilter').value;
+      const yearFilter = document.getElementById('yearFilter').value;
+      const typeFilter = document.getElementById('typeFilter').value;
+      const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+
+      filteredPapers = papers.filter(paper => {
+        const matchesExam = !examFilter || paper.exam_code === examFilter;
+        const matchesYear = !yearFilter || paper.year == yearFilter;
+        const matchesType = !typeFilter || paper.paper_type === typeFilter;
+        const matchesSearch = !searchTerm || 
+          paper.title.toLowerCase().includes(searchTerm) ||
+          (paper.description && paper.description.toLowerCase().includes(searchTerm));
+
+        return matchesExam && matchesYear && matchesType && matchesSearch;
+      });
+
+      renderPapers();
+    }
+
+    // View PDF in modal
+    function viewPdf(filePath) {
+      // Extract filename from the file path
+      const filename = filePath.split('/').pop();
+      // URL encode the filename to handle spaces and special characters
+      const encodedFilename = encodeURIComponent(filename);
+      const pdfUrl = `/api/papers/file/${encodedFilename}`;
+      
+      // Store current file path for download
+      window.currentPdfPath = filePath;
+      
+      // Show modal and reset state
+      document.getElementById('pdfTitle').textContent = filename;
+      document.getElementById('pdfLoading').style.display = 'block';
+      document.getElementById('pdfFrame').style.display = 'none';
+      document.getElementById('pdfError').style.display = 'none';
+      document.getElementById('pdfViewer').style.display = 'flex';
+      
+      // Load PDF with error handling
+      const iframe = document.getElementById('pdfFrame');
+      iframe.onerror = function() {
+        showPdfError();
+      };
+      
+      // Set timeout to show error if PDF doesn't load
+      setTimeout(() => {
+        if (document.getElementById('pdfLoading').style.display !== 'none') {
+          showPdfError();
+        }
+      }, 10000); // 10 second timeout
+      
+      iframe.src = pdfUrl;
+    }
+    
+    // Hide loading and show PDF
+    function hidePdfLoading() {
+      document.getElementById('pdfLoading').style.display = 'none';
+      document.getElementById('pdfFrame').style.display = 'block';
+    }
+    
+    // Show PDF error
+    function showPdfError() {
+      document.getElementById('pdfLoading').style.display = 'none';
+      document.getElementById('pdfFrame').style.display = 'none';
+      document.getElementById('pdfError').style.display = 'block';
+    }
+    
+    // Download current PDF
+    function downloadCurrentPdf() {
+      if (window.currentPdfPath) {
+        const filename = window.currentPdfPath.split('/').pop();
+        const encodedFilename = encodeURIComponent(filename);
+        const downloadUrl = `/api/papers/file/${encodedFilename}`;
+        
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = filename;
+        link.click();
+      }
+    }
+
+    // Download paper
+    async function downloadPaper(paperId) {
+      try {
+        const response = await fetch(`/api/papers/${paperId}/download`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          // Create download link
+          const filename = data.paper.filePath.split('/').pop();
+          const encodedFilename = encodeURIComponent(filename);
+          const downloadUrl = `/api/papers/file/${encodedFilename}`;
+          
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = filename;
+          link.click();
+          
+          showNotification('Download started!', 'success');
+          // Refresh papers to update download count
+          loadPapers();
+        } else {
+          showNotification('Download failed', 'error');
+        }
+      } catch (error) {
+        console.error('Download error:', error);
+        showNotification('Download failed', 'error');
+      }
+    }
+
+    // Close PDF modal
+    function closePdfViewer() {
+      document.getElementById('pdfViewer').style.display = 'none';
+      document.getElementById('pdfFrame').src = '';
+      document.getElementById('pdfFrame').style.display = 'none';
+      document.getElementById('pdfLoading').style.display = 'block';
+      document.getElementById('pdfError').style.display = 'none';
+      window.currentPdfPath = null;
+    }
+
+    // Show notification
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPapers();
+      
+      // Close modal when clicking outside
+      document.getElementById('pdfViewer').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('pdfViewer')) {
+          closePdfViewer();
+        }
+      });
+      
+      // Close modal with Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('pdfViewer').style.display === 'flex') {
+          closePdfViewer();
+        }
+      });
+    });
+  </script>
+
+  <style>
+    .papers-main {
+      padding: 2rem 0;
+      min-height: 80vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .filter-section {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      min-width: 150px;
+    }
+
+    .filter-group label {
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .papers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .paper-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .paper-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .paper-card h3 {
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .paper-description {
+      color: #666;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .paper-meta {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .paper-year {
+      background: #007bff;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 15px;
+      font-size: 0.9rem;
+    }
+
+    .paper-type {
+      background: #28a745;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 15px;
+      font-size: 0.9rem;
+    }
+
+    .paper-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .paper-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-view {
+      background: #17a2b8;
+      color: white;
+    }
+
+    .btn-view:hover {
+      background: #138496;
+    }
+
+    .btn-download {
+      background: #007bff;
+      color: white;
+    }
+
+    .btn-download:hover {
+      background: #0056b3;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      grid-column: 1 / -1;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 1rem;
+      border-radius: 5px;
+      margin: 1rem 0;
+      grid-column: 1 / -1;
+    }
+
+    .no-papers {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      grid-column: 1 / -1;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #fff;
+      width: 95%;
+      max-width: 900px;
+      max-height: 90vh;
+      border-radius: 10px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: #333;
+      font-size: 1.2rem;
+    }
+
+    .modal-body {
+      flex: 1;
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    .close {
+      font-size: 24px;
+      cursor: pointer;
+      color: #333;
+      background: none;
+      border: none;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close:hover {
+      color: #000;
+      background: #f0f0f0;
+      border-radius: 50%;
+    }
+
+    .pdf-loading {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+
+    .pdf-loading i {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .pdf-error {
+      text-align: center;
+      padding: 2rem;
+      color: #dc3545;
+    }
+
+    .pdf-error i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .pdf-error p {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    /* Notifications */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 2rem;
+      border-radius: 5px;
+      color: white;
+      z-index: 1001;
+    }
+
+    .notification.success {
+      background: #28a745;
+    }
+
+    .notification.error {
+      background: #dc3545;
+    }
+
+    @media (max-width: 768px) {
+      .filter-section {
+        flex-direction: column;
+      }
+      
+      .papers-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</body>
+</html>
