@@ -25,7 +25,10 @@ async function setupDatabase() {
   } catch (error) {
     console.error('Error setting up database:', error);
   } finally {
-    await pool.end();
+    // Only call end() if it exists (for PostgreSQL)
+    if (pool.end && typeof pool.end === 'function') {
+      await pool.end();
+    }
   }
 }
 
