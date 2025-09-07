@@ -25,11 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Remove active class from all buttons
             categoryBtns.forEach(b => b.classList.remove('active'));
             // Add active class to clicked button
-            this.classList.add('active');
-
-            const category = this.getAttribute('data-category');
-
-            videoCards.forEach(card => {
+            } finally {
+  // Only call end() if it exists (for PostgreSQL)
+  if (pool.end && typeof pool.end === 'function') {
+    await pool.end();
+  }
+}
                 if (category === 'all' || card.classList.contains(category)) {
                     card.style.display = 'block';
                 } else {
