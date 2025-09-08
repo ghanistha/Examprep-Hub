@@ -368,15 +368,10 @@ router.post('/upload', optionalAuth, upload.single('pdf'), async (req, res) => {
 // Serve PDF files
 router.get('/file/:filename', (req, res) => {
   try {
-    // Decode the filename to handle URL-encoded characters
-    const filename = decodeURIComponent(req.params.filename);
+    const filename = req.params.filename;
     const filePath = path.join(__dirname, '..', 'uploads', 'papers', filename);
     
-    console.log('Requested filename:', filename);
-    console.log('File path:', filePath);
-    
     if (!fs.existsSync(filePath)) {
-      console.log('File not found:', filePath);
       return res.status(404).json({ error: 'File not found' });
     }
     

@@ -112,3 +112,5 @@ INSERT INTO papers (title, description, year, paper_type, file_path, file_size, 
 ('MPSC Mains 2023 General Studies', 'General Studies Paper - MPSC State Services Mains 2023', 2023, 'mains', '/uploads/papers/mpsc paper.pdf', 2048000, 2),
 ('SSC CGL 2023 Tier 1', 'Combined Graduate Level Tier 1 Examination 2023', 2023, 'prelims', '/uploads/papers/ssc cgl paper.pdf', 1536000, 3)
 ON CONFLICT DO NOTHING;
+
+
