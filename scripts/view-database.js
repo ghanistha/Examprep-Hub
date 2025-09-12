@@ -12,6 +12,18 @@ async function viewDatabase() {
     });
     console.log('');
     
+    // View centers
+    console.log('📍 CENTERS TABLE:');
+    const centers = await db.query('SELECT id, name, city, state FROM centers');
+    if (centers.rows.length > 0) {
+      centers.rows.forEach(center => {
+        console.log(`  ID: ${center.id} | Name: ${center.name} | City: ${center.city || '-'} | State: ${center.state || '-'}`);
+      });
+    } else {
+      console.log('  No centers found');
+    }
+    console.log('');
+
     // View users
     console.log('👥 USERS TABLE:');
     const users = await db.query('SELECT id, full_name, email, exam_interest, created_at FROM users');
@@ -79,6 +91,7 @@ async function viewDatabase() {
     console.log(`  Total Videos: ${videos.rows.length}`);
     console.log(`  Total Papers: ${papers.rows.length}`);
     console.log(`  Total Schedules: ${schedules.rows.length}`);
+    console.log(`  Total Centers: ${centers.rows.length}`);
     
   } catch (error) {
     console.error('❌ Error viewing database:', error);

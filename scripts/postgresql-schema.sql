@@ -99,6 +99,32 @@ CREATE TABLE IF NOT EXISTS bookmarks (
     FOREIGN KEY (paper_id) REFERENCES papers(id)
 );
 
+-- Exam centers table
+CREATE TABLE IF NOT EXISTS centers (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    address TEXT,
+    city TEXT,
+    state TEXT,
+    country TEXT DEFAULT 'India',
+    website_url TEXT,
+    maps_url TEXT,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sample centers (optional)
+INSERT INTO centers (name, address, city, state, website_url, maps_url)
+VALUES
+('Global Education Exam Center', 'Nagpur, Maharashtra — used for MPSC, UPSC, etc.', 'Nagpur', 'Maharashtra', 'https://globaledu.net.in', 'https://www.google.com/maps/search/?api=1&query=Global+Education+Exam+Center+Nagpur'),
+('Ion Digital Zone (Online Examination Centre)', 'Beltarodi Road, Jayprakash Nagar, Nagpur', 'Nagpur', 'Maharashtra', NULL, 'https://www.google.com/maps/search/?api=1&query=Ion+Digital+Zone+Beltarodi+Road+Jayprakash+Nagar+Nagpur'),
+('Nrupali Infotech IRM Center', 'Manewada Road, near Mitsubishi, Nagpur', 'Nagpur', 'Maharashtra', NULL, 'https://www.google.com/maps/search/?api=1&query=Nrupali+Infotech+IRM+Center+Manewada+Road+Nagpur'),
+('MSV InforTech / Infotech / Training Centres', 'Various locations – see Justdial listings in Nagpur', 'Nagpur', 'Maharashtra', NULL, 'https://www.google.com/maps/search/?api=1&query=MSV+Infotech+Nagpur+Online+Examination+Centre')
+ON CONFLICT DO NOTHING;
+
 -- Insert sample exams
 INSERT INTO exams (name, code, description, exam_type) VALUES
 ('UPSC Civil Services Examination', 'UPSC_CSE', 'Union Public Service Commission Civil Services Examination', 'combined'),
@@ -112,5 +138,8 @@ INSERT INTO papers (title, description, year, paper_type, file_path, file_size, 
 ('MPSC Mains 2023 General Studies', 'General Studies Paper - MPSC State Services Mains 2023', 2023, 'mains', '/uploads/papers/mpsc paper.pdf', 2048000, 2),
 ('SSC CGL 2023 Tier 1', 'Combined Graduate Level Tier 1 Examination 2023', 2023, 'prelims', '/uploads/papers/ssc cgl paper.pdf', 1536000, 3)
 ON CONFLICT DO NOTHING;
+
+
+
 
 

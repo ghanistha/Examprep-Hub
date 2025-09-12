@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../config/sqlite-database');
+const db = require('../config/database');
 const { optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();

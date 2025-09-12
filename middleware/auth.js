@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const pool = require('../config/database');
+const db = require('../config/database');
 
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -11,10 +11,10 @@ const authenticateToken = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
-    
-    // Verify user still exists and is active
-    const userResult = await pool.query(
-      'SELECT id, email, full_name, exam_interest FROM users WHERE id = $1 AND is_active = true',
+
+    // Verify user still exists and is active (SQLite style)
+    const userResult = await db.query(
+      'SELECT id, email, full_name, exam_interest FROM users WHERE id = ? AND is_active = 1',
       [decoded.userId]
     );
 
@@ -41,9 +41,9 @@ const optionalAuth = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
-    
-    const userResult = await pool.query(
-      'SELECT id, email, full_name, exam_interest FROM users WHERE id = $1 AND is_active = true',
+
+    const userResult = await db.query(
+      'SELECT id, email, full_name, exam_interest FROM users WHERE id = ? AND is_active = 1',
       [decoded.userId]
     );
 

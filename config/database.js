@@ -15,10 +15,33 @@ if (usePostgreSQL) {
     }
   });
 
+  // Convert SQLite-style placeholders and date functions to PostgreSQL equivalents
+  const normalizeSqlForPostgres = (sql) => {
+    let converted = sql;
+
+    // Replace SQLite datetime/date functions with Postgres
+    converted = converted.replace(/datetime\(\s*'now'\s*\)/gi, 'NOW()');
+    // datetime('now', '-7 days') -> NOW() - INTERVAL '7 days'
+    converted = converted.replace(/datetime\(\s*'now'\s*,\s*'-([0-9]+)\s+days'\s*\)/gi, (m, d) => `NOW() - INTERVAL '${d} days'`);
+    converted = converted.replace(/date\(\s*'now'\s*\)/gi, 'CURRENT_DATE');
+    // strftime('%Y', col) -> TO_CHAR(col, 'YYYY')
+    converted = converted.replace(/strftime\(\s*'%Y'\s*,\s*([^)]+)\)/gi, "TO_CHAR($1, 'YYYY')");
+    // strftime('%m', col) -> TO_CHAR(col, 'MM')
+    converted = converted.replace(/strftime\(\s*'%m'\s*,\s*([^)]+)\)/gi, "TO_CHAR($1, 'MM')");
+    // CURRENT_TIMESTAMP works in both; handle neutral 7d interval pattern if present
+    converted = converted.replace(/CURRENT_TIMESTAMP\s*-\s*INTERVAL\s*'7\s*days'/gi, "NOW() - INTERVAL '7 days'");
+
+    // Convert positional placeholders: ? -> $1, $2, ... while respecting already-numbered $n
+    let index = 0;
+    converted = converted.replace(/\?/g, () => `$${++index}`);
+    return converted;
+  };
+
   db = {
     query: async (text, params = []) => {
       try {
-        const result = await pool.query(text, params);
+        const pgText = normalizeSqlForPostgres(text);
+        const result = await pool.query(pgText, params);
         return {
           rows: result.rows,
           rowCount: result.rowCount

@@ -7,10 +7,22 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
-  credentials: true
-}));
+// Robust CORS configuration to support credentials and preflight
+const allowedOrigins = (process.env.CORS_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean);
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow same-origin or non-browser
+    if (allowedOrigins.length === 0) return callback(null, true); // allow all if not specified
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(null, false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -27,6 +39,7 @@ app.use('/api/videos', require('./routes/videos'));
 app.use('/api/papers', require('./routes/papers'));
 app.use('/api/schedules', require('./routes/schedules'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/centers', require('./routes/centers'));
 
 // Serve HTML files
 app.get('/', (req, res) => {

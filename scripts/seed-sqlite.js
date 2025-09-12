@@ -146,6 +146,50 @@ async function seedSQLiteDatabase() {
     }
     console.log('✅ Sample schedules inserted');
 
+    // Insert sample exam centers
+    const centers = [
+      {
+        name: 'Global Education Exam Center',
+        address: 'Nagpur, Maharashtra — used for MPSC, UPSC, etc.',
+        city: 'Nagpur',
+        state: 'Maharashtra',
+        website_url: 'https://globaledu.net.in',
+        maps_url: 'https://www.google.com/maps/search/?api=1&query=Global+Education+Exam+Center+Nagpur'
+      },
+      {
+        name: 'Ion Digital Zone (Online Examination Centre)',
+        address: 'Beltarodi Road, Jayprakash Nagar, Nagpur',
+        city: 'Nagpur',
+        state: 'Maharashtra',
+        website_url: null,
+        maps_url: 'https://www.google.com/maps/search/?api=1&query=Ion+Digital+Zone+Beltarodi+Road+Jayprakash+Nagar+Nagpur'
+      },
+      {
+        name: 'Nrupali Infotech IRM Center',
+        address: 'Manewada Road, near Mitsubishi, Nagpur',
+        city: 'Nagpur',
+        state: 'Maharashtra',
+        website_url: null,
+        maps_url: 'https://www.google.com/maps/search/?api=1&query=Nrupali+Infotech+IRM+Center+Manewada+Road+Nagpur'
+      },
+      {
+        name: 'MSV InforTech / Infotech / Training Centres',
+        address: 'Various locations – see Justdial listings in Nagpur',
+        city: 'Nagpur',
+        state: 'Maharashtra',
+        website_url: null,
+        maps_url: 'https://www.google.com/maps/search/?api=1&query=MSV+Infotech+Nagpur+Online+Examination+Centre'
+      }
+    ];
+
+    for (const c of centers) {
+      await db.query(
+        'INSERT OR IGNORE INTO centers (name, address, city, state, website_url, maps_url) VALUES (?, ?, ?, ?, ?, ?)',
+        [c.name, c.address, c.city, c.state, c.website_url, c.maps_url]
+      );
+    }
+    console.log('✅ Sample exam centers inserted');
+
     // Create demo user
     const hashedPassword = await bcrypt.hash('demo123', 10);
     await db.query(

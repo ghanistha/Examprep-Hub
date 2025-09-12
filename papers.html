@@ -120,8 +120,17 @@
         try {
           const response = await fetch('/api/papers?limit=200');
           if (response.ok) {
-            const data = await response.json();
-            if (Array.isArray(data.papers)) {
+            const contentType = response.headers.get('content-type') || '';
+            let data = null;
+            if (contentType.includes('application/json')) {
+              try { data = await response.json(); } catch (_) { data = null; }
+            } else {
+              const text = await response.text();
+              if (text && text.trim().length) {
+                try { data = JSON.parse(text); } catch (_) { data = null; }
+              }
+            }
+            if (data && Array.isArray(data.papers)) {
               apiPapers = data.papers;
             }
           }
@@ -316,8 +325,17 @@
             headers: { 'Content-Type': 'application/json' }
           });
           if (res.ok) {
-            const data = await res.json();
-            const href = encodeURI(data.paper?.filePath || paper.file_path);
+            const contentType = res.headers.get('content-type') || '';
+            let data = null;
+            if (contentType.includes('application/json')) {
+              try { data = await res.json(); } catch (_) { data = null; }
+            } else {
+              const text = await res.text();
+              if (text && text.trim().length) {
+                try { data = JSON.parse(text); } catch (_) { data = null; }
+              }
+            }
+            const href = encodeURI((data && data.paper && data.paper.filePath) || paper.file_path);
             const link = document.createElement('a');
             link.href = href;
             link.download = paper.title + ".pdf";

@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../config/sqlite-database');
+const db = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
@@ -20,15 +20,14 @@ router.get('/progress', authenticateToken, async (req, res) => {
     `;
     
     const queryParams = [req.user.id];
-    let paramCount = 2;
 
     if (type) {
-      query += ` AND up.progress_type = $${paramCount++}`;
+      query += ` AND up.progress_type = ?`;
       queryParams.push(type);
     }
 
     query += ` ORDER BY up.created_at DESC`;
-    query += ` LIMIT $${paramCount++} OFFSET $${paramCount++}`;
+    query += ` LIMIT ? OFFSET ?`;
     queryParams.push(parseInt(limit), parseInt(offset));
 
     const result = await db.query(query, queryParams);
@@ -63,15 +62,14 @@ router.get('/bookmarks', authenticateToken, async (req, res) => {
     `;
     
     const queryParams = [req.user.id];
-    let paramCount = 2;
 
     if (type) {
-      query += ` AND b.bookmark_type = $${paramCount++}`;
+      query += ` AND b.bookmark_type = ?`;
       queryParams.push(type);
     }
 
     query += ` ORDER BY b.created_at DESC`;
-    query += ` LIMIT $${paramCount++} OFFSET $${paramCount++}`;
+    query += ` LIMIT ? OFFSET ?`;
     queryParams.push(parseInt(limit), parseInt(offset));
 
     const result = await db.query(query, queryParams);
@@ -121,14 +119,14 @@ router.post('/bookmarks', authenticateToken, async (req, res) => {
     }
 
     // Add bookmark
-    const result = await db.query(
-      'INSERT INTO bookmarks (user_id, video_id, paper_id, bookmark_type) VALUES (?, ?, ?, ?) RETURNING id',
+    await db.query(
+      'INSERT INTO bookmarks (user_id, video_id, paper_id, bookmark_type) VALUES (?, ?, ?, ?)',
       [req.user.id, videoId || null, paperId || null, bookmarkType]
     );
 
     res.status(201).json({
       message: 'Bookmark added successfully',
-      bookmarkId: result.rows[0].id
+      // In SQLite we do not have RETURNING; clients typically re-fetch or ignore id
     });
   } catch (error) {
     if (error.code === '23505') { // Unique constraint violation
@@ -145,11 +143,11 @@ router.delete('/bookmarks/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
 
     const result = await db.query(
-      'DELETE FROM bookmarks WHERE id = ? AND user_id = ? RETURNING id',
+      'DELETE FROM bookmarks WHERE id = ? AND user_id = ?',
       [id, req.user.id]
     );
 
-    if (result.rows.length === 0) {
+    if ((result.rowCount || 0) === 0) {
       return res.status(404).json({ error: 'Bookmark not found' });
     }
 
@@ -183,7 +181,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
 
     // Get recent activity (last 7 days)
     const activityResult = await db.query(
-      'SELECT COUNT(*) as recent_activity FROM user_progress WHERE user_id = ? AND created_at >= NOW() - INTERVAL \'7 days\'',
+      "SELECT COUNT(*) as recent_activity FROM user_progress WHERE user_id = ? AND created_at >= datetime('now', '-7 days')",
       [req.user.id]
     );
 

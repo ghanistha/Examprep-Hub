@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../config/sqlite-database');
+const db = require('../config/database');
 const { optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -79,11 +79,16 @@ router.get('/:id', optionalAuth, async (req, res) => {
       [id]
     );
 
-    // Record user progress if authenticated
+    // Record user progress if authenticated (portable for SQLite/Postgres)
     if (req.user) {
       await db.query(
-        'INSERT INTO user_progress (user_id, video_id, progress_type) VALUES (?, ?, ?) ON CONFLICT DO NOTHING',
-        [req.user.id, id, 'video_watched']
+        `INSERT INTO user_progress (user_id, video_id, progress_type)
+         SELECT ?, ?, ?
+         WHERE NOT EXISTS (
+           SELECT 1 FROM user_progress 
+           WHERE user_id = ? AND video_id = ? AND progress_type = ?
+         )`,
+        [req.user.id, id, 'video_watched', req.user.id, id, 'video_watched']
       );
     }
 

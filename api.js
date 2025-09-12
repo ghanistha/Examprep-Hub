@@ -1,7 +1,19 @@
 // API utility functions for frontend
 class ExamPrepAPI {
   constructor() {
-    this.baseURL = 'http://localhost:3000/api';
+    const isFileProtocol = window.location.protocol === 'file:';
+    const currentHost = window.location.origin;
+    // Use same-origin by default; allow override via window.API_BASE_URL; fallback to localhost when opened from filesystem
+    const base = window.API_BASE_URL || (isFileProtocol ? 'http://localhost:3000/api' : `${currentHost}/api`);
+    this.baseURL = base.replace(/\/$/, '');
+    // Prepare fallbacks (handle case where frontend runs on a dev server like :5501)
+    this.fallbackBaseURLs = [];
+    if (!/localhost:3000\/api$/.test(this.baseURL)) {
+      this.fallbackBaseURLs.push('http://localhost:3000/api');
+    }
+    if (!/localhost:5501\/api$/.test(this.baseURL)) {
+      this.fallbackBaseURLs.push('http://localhost:5501/api');
+    }
     this.token = localStorage.getItem('authToken');
   }
 
@@ -35,14 +47,49 @@ class ExamPrepAPI {
     };
 
     try {
-      const response = await fetch(url, config);
-      const data = await response.json();
+      let response = await fetch(url, config);
+      // If same-origin failed due to wrong port/server, try fallbacks
+      if ((!response.ok && (response.status === 404 || response.status === 405)) || response.type === 'opaque') {
+        for (const fb of this.fallbackBaseURLs) {
+          try {
+            const fbResp = await fetch(`${fb}${endpoint}`, config);
+            if (fbResp.ok || fbResp.status !== 0) {
+              response = fbResp;
+              this.baseURL = fb.replace(/\/$/, '');
+              break;
+            }
+          } catch (_) {
+            // continue to next fallback
+          }
+        }
+      }
+      const contentType = response.headers.get('content-type') || '';
 
-      if (!response.ok) {
-        throw new Error(data.error || 'API request failed');
+      // Safely parse JSON if present; handle empty or non-JSON bodies
+      let data = null;
+      if (contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch (_) {
+          data = null;
+        }
+      } else {
+        const text = await response.text();
+        if (text && text.trim().length) {
+          try {
+            data = JSON.parse(text);
+          } catch (_) {
+            data = { message: text };
+          }
+        }
       }
 
-      return data;
+      if (!response.ok) {
+        const message = (data && (data.error || data.message)) || `${response.status} ${response.statusText}`;
+        throw new Error(message);
+      }
+
+      return data || {};
     } catch (error) {
       console.error('API Error:', error);
       throw error;

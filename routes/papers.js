@@ -2,8 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const db = require('../config/sqlite-database');
-const { optionalAuth, requireAuth } = require('../middleware/auth');
+const db = require('../config/database');
+const { optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -189,11 +189,16 @@ router.post('/:id/download', optionalAuth, async (req, res) => {
       [id]
     );
 
-    // Record user progress if authenticated
+    // Record user progress if authenticated (portable for SQLite/Postgres)
     if (req.user) {
       await db.query(
-        'INSERT INTO user_progress (user_id, paper_id, progress_type) VALUES (?, ?, ?) ON CONFLICT DO NOTHING',
-        [req.user.id, id, 'paper_downloaded']
+        `INSERT INTO user_progress (user_id, paper_id, progress_type)
+         SELECT ?, ?, ?
+         WHERE NOT EXISTS (
+           SELECT 1 FROM user_progress 
+           WHERE user_id = ? AND paper_id = ? AND progress_type = ?
+         )`,
+        [req.user.id, id, 'paper_downloaded', req.user.id, id, 'paper_downloaded']
       );
     }
 

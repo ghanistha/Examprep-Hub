@@ -94,3 +94,20 @@ CREATE TABLE IF NOT EXISTS bookmarks (
     FOREIGN KEY (paper_id) REFERENCES papers(id)
 );
 
+-- Exam centers table
+CREATE TABLE IF NOT EXISTS centers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    address TEXT,
+    city TEXT,
+    state TEXT,
+    country TEXT DEFAULT 'India',
+    website_url TEXT,
+    maps_url TEXT,
+    latitude REAL,
+    longitude REAL,
+    is_active BOOLEAN DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
